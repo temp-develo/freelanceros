@@ -1,0 +1,8 @@
+[user]
+	email = josephbouryal@gmail.com
+	name = Joseph
+
+[core]
+	editor = nvim
+[color]
+	ui = true

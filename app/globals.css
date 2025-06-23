@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Flexoki Light Theme */
+  --background: #fffcf0; /* base-paper */
+  --foreground: #100f0f; /* base-black */
+  --card: #f2f0e5; /* base-50 */
+  --card-foreground: #100f0f; /* base-black */
+  --popover: #fffcf0; /* base-paper */
+  --popover-foreground: #100f0f; /* base-black */
+  --primary: #205ea6; /* blue */
+  --primary-foreground: #fffcf0; /* base-paper */
+  --secondary: #e6e4d9; /* base-100 */
+  --secondary-foreground: #282726; /* base-900 */
+  --muted: #dad8ce; /* base-150 */
+  --muted-foreground: #575653; /* base-700 */
+  --accent: #e6e4d9; /* base-100 */
+  --accent-foreground: #282726; /* base-900 */
+  --destructive: #af3029; /* red */
+  --destructive-foreground: #fffcf0; /* base-paper */
+  --border: #cecdc3; /* base-200 */
+  --input: #cecdc3; /* base-200 */
+  --ring: #205ea6; /* blue */
+  --chart-1: #af3029; /* red */
+  --chart-2: #66800b; /* green */
+  --chart-3: #205ea6; /* blue */
+  --chart-4: #bc5215; /* orange */
+  --chart-5: #5e409d; /* purple */
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Flexoki Dark Theme */
+  --background: #100f0f; /* base-black */
+  --foreground: #cecdc3; /* base-200 */
+  --card: #1c1b1a; /* base-950 */
+  --card-foreground: #cecdc3; /* base-200 */
+  --popover: #1c1b1a; /* base-950 */
+  --popover-foreground: #cecdc3; /* base-200 */
+  --primary: #4385be; /* blue-light */
+  --primary-foreground: #100f0f; /* base-black */
+  --secondary: #282726; /* base-900 */
+  --secondary-foreground: #b7b5ac; /* base-300 */
+  --muted: #343331; /* base-850 */
+  --muted-foreground: #878580; /* base-500 */
+  --accent: #343331; /* base-850 */
+  --accent-foreground: #b7b5ac; /* base-300 */
+  --destructive: #d14d41; /* red-light */
+  --destructive-foreground: #100f0f; /* base-black */
+  --border: #403e3c; /* base-800 */
+  --input: #403e3c; /* base-800 */
+  --ring: #4385be; /* blue-light */
+  --chart-1: #d14d41; /* red-light */
+  --chart-2: #879a39; /* green-light */
+  --chart-3: #4385be; /* blue-light */
+  --chart-4: #da702c; /* orange-light */
+  --chart-5: #8b7ec8; /* purple-light */
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Focus styles for accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    :root {
+      --border: #000000;
+      --ring: #000000;
+    }
+    
+    .dark {
+      --border: #ffffff;
+      --ring: #ffffff;
+    }
+  }
+  
+  /* Screen reader only content */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Override specific elements that need smooth transitions */
+.transition-theme {
+  transition: all 0.3s ease;
+}
+
+/* Loading animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--foreground));
+}
+
+/* Print styles */
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
