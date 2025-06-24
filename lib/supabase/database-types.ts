@@ -169,7 +169,7 @@ export interface Database {
           title: string
           description?: string | null
           status?: string
-          amount: number
+          amount?: number
           currency?: string
           valid_until?: string | null
           sent_at?: string | null
@@ -191,6 +191,70 @@ export interface Database {
           sent_at?: string | null
           viewed_at?: string | null
           responded_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      proposal_sections: {
+        Row: {
+          id: string
+          proposal_id: string
+          title: string
+          content: string | null
+          order_position: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          proposal_id: string
+          title: string
+          content?: string | null
+          order_position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          proposal_id?: string
+          title?: string
+          content?: string | null
+          order_position?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      proposal_items: {
+        Row: {
+          id: string
+          proposal_id: string
+          description: string
+          quantity: number
+          unit_price: number
+          amount: number
+          order_position: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          proposal_id: string
+          description: string
+          quantity?: number
+          unit_price?: number
+          amount?: number
+          order_position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          proposal_id?: string
+          description?: string
+          quantity?: number
+          unit_price?: number
+          amount?: number
+          order_position?: number
           created_at?: string
           updated_at?: string
         }
