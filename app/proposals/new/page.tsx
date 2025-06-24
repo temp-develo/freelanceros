@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { AppLayout } from '@/components/layout/AppLayout'
 import { useAuth } from '@/hooks/useAuth'
 import { useProposalForm } from '@/hooks/useProposalForm'
 import { 
@@ -12,16 +13,11 @@ import {
   getProposalDraftAge
 } from '@/lib/storage/proposalDraft'
 import { CompleteProposalData } from '@/lib/validations/proposal'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
@@ -31,14 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,19 +48,10 @@ import {
 import { FormFieldError, FormStepErrorSummary } from '@/components/ui/form-field-error'
 import { AutoSaveIndicator, ConnectionStatus } from '@/components/ui/auto-save-indicator'
 import {
-  Home,
-  FileText,
-  FolderOpen,
-  Users,
-  BarChart3,
-  Settings,
-  Menu,
-  Bell,
   ArrowLeft,
   ArrowRight,
   Check,
   User,
-  LogOut,
   Building,
   Mail,
   Phone,
@@ -93,19 +72,11 @@ import {
   Send,
   RefreshCw,
   Trash2,
-  Info
+  Info,
+  FileText,
+  Users
 } from 'lucide-react'
 import { toast } from 'sonner'
-
-const sidebarItems = [
-  { icon: Home, label: 'Dashboard', href: '/dashboard' },
-  { icon: FileText, label: 'Proposals', href: '/proposals', active: true, badge: '3' },
-  { icon: FolderOpen, label: 'Projects', href: '/projects', badge: '8' },
-  { icon: Users, label: 'Client Portals', href: '/clients' },
-  { icon: Clock, label: 'Time Tracking', href: '/time-tracking' },
-  { icon: BarChart3, label: 'Reports', href: '/reports' },
-  { icon: Settings, label: 'Settings', href: '/settings' },
-]
 
 // Form steps configuration
 const steps = [
@@ -219,8 +190,7 @@ const paymentTermsOptions = [
 
 export default function NewProposalPage() {
   const router = useRouter()
-  const { user, signOut } = useAuth()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { user } = useAuth()
   const [isOnline, setIsOnline] = useState(true)
   const [showDraftDialog, setShowDraftDialog] = useState(false)
   const [draftAge, setDraftAge] = useState<number | null>(null)
@@ -289,10 +259,6 @@ export default function NewProposalPage() {
     }
   }, [])
 
-  const handleSignOut = async () => {
-    await signOut()
-  }
-
   const handleLoadDraft = () => {
     if (user?.id) {
       const draftData = loadProposalDraft(user.id)
@@ -340,53 +306,24 @@ export default function NewProposalPage() {
     return 'upcoming'
   }
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="flex items-center space-x-2 p-6 border-b">
-        <div className="w-8 h-8 bg-gradient-to-r from-blue-light to-purple-light rounded-lg"></div>
-        <span className="font-bold text-xl">FreelancerOS</span>
-      </div>
+  // Custom header actions for new proposal page
+  const headerActions = (
+    <div className="flex items-center gap-2">
+      {/* Auto-save Status */}
+      <AutoSaveIndicator
+        isAutoSaving={isAutoSaving}
+        lastAutoSaved={lastAutoSaved}
+        isDirty={isDirty}
+      />
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {sidebarItems.map((item) => (
-          <Button
-            key={item.label}
-            variant={item.active ? "secondary" : "ghost"}
-            className="w-full justify-start"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <item.icon className="w-4 h-4 mr-3" />
-            <span className="flex-1 text-left">{item.label}</span>
-            {item.badge && (
-              <Badge variant="secondary" className="ml-auto">
-                {item.badge}
-              </Badge>
-            )}
-          </Button>
-        ))}
-      </nav>
+      {/* Connection Status */}
+      <ConnectionStatus isOnline={isOnline} />
 
-      {/* User Profile Section */}
-      <div className="p-4 border-t">
-        <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
-          <Avatar className="w-8 h-8">
-            <AvatarImage src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&fit=crop" />
-            <AvatarFallback>
-              {user?.full_name?.split(' ').map(n => n[0]).join('') || user?.email?.[0]?.toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">
-              {user?.full_name || 'User'}
-            </p>
-            <p className="text-xs text-muted-foreground truncate">
-              {user?.email}
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Save Draft Button */}
+      <Button variant="outline" size="sm" onClick={handleManualSave} disabled={isAutoSaving}>
+        <Save className="w-4 h-4 mr-2" />
+        Save Draft
+      </Button>
     </div>
   )
 
@@ -853,7 +790,7 @@ export default function NewProposalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <AppLayout headerActions={headerActions}>
       {/* Draft Recovery Dialog */}
       <AlertDialog open={showDraftDialog} onOpenChange={setShowDraftDialog}>
         <AlertDialogContent>
@@ -877,252 +814,149 @@ export default function NewProposalPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Mobile Sidebar */}
-      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-80">
-          <SidebarContent />
-        </SheetContent>
-      </Sheet>
-
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-80 lg:flex-col">
-        <div className="flex flex-col flex-1 border-r bg-card">
-          <SidebarContent />
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="lg:pl-80">
-        {/* Header */}
-        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
-          {/* Mobile menu button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="w-5 h-5" />
-            <span className="sr-only">Open sidebar</span>
-          </Button>
-
-          {/* Back to Proposals */}
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.push('/proposals')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back to Proposals</span>
-            </Button>
-          </div>
-
-          {/* Header Actions */}
-          <div className="flex items-center gap-x-4 lg:gap-x-6">
-            {/* Auto-save Status */}
-            <AutoSaveIndicator
-              isAutoSaving={isAutoSaving}
-              lastAutoSaved={lastAutoSaved}
-              isDirty={isDirty}
-            />
-
-            {/* Connection Status */}
-            <ConnectionStatus isOnline={isOnline} />
-
-            {/* Save Draft Button */}
-            <Button variant="outline" size="sm" onClick={handleManualSave} disabled={isAutoSaving}>
-              <Save className="w-4 h-4 mr-2" />
-              Save Draft
-            </Button>
-
-            {/* Notifications */}
-            <Button variant="ghost" size="sm" className="relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-light text-xs text-white flex items-center justify-center">
-                2
-              </span>
-              <span className="sr-only">View notifications</span>
-            </Button>
-
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
-            {/* User Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&fit=crop" />
-                    <AvatarFallback>
-                      {user?.full_name?.split(' ').map(n => n[0]).join('') || user?.email?.[0]?.toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {user?.full_name || 'User'}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user?.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <main className="py-8">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            {/* Page Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold tracking-tight">Create New Proposal</h1>
-              <p className="text-muted-foreground mt-2">
-                Follow the steps below to create a comprehensive proposal for your client
-              </p>
-            </div>
-
-            {/* Progress Indicator */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-medium">Step {currentStep} of {totalSteps}</span>
-                <span className="text-sm text-muted-foreground">{Math.round(completionPercentage)}% complete</span>
+      <div className="py-8">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          {/* Page Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push('/proposals')}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Back to Proposals</span>
+              </Button>
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">Create New Proposal</h1>
+                <p className="text-muted-foreground mt-2">
+                  Follow the steps below to create a comprehensive proposal for your client
+                </p>
               </div>
-              <Progress value={completionPercentage} className="h-2 mb-6" />
-              
-              {/* Step Indicators */}
-              <div className="flex items-center justify-between">
-                {steps.map((step, index) => {
-                  const status = getStepStatus(step.id)
-                  const StepIcon = step.icon
-                  
-                  return (
-                    <div key={step.id} className="flex flex-col items-center">
-                      <div className={`
-                        w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors cursor-pointer
-                        ${status === 'completed' ? 'bg-green-light border-green-light text-white' :
-                          status === 'current' ? 'bg-blue-light border-blue-light text-white' :
-                          'bg-background border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground/50'}
-                      `}
-                      onClick={() => goToStep(step.id)}
-                      >
-                        {status === 'completed' ? (
-                          <Check className="w-5 h-5" />
-                        ) : (
-                          <StepIcon className="w-5 h-5" />
-                        )}
+            </div>
+          </div>
+
+          {/* Progress Indicator */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium">Step {currentStep} of {totalSteps}</span>
+              <span className="text-sm text-muted-foreground">{Math.round(completionPercentage)}% complete</span>
+            </div>
+            <Progress value={completionPercentage} className="h-2 mb-6" />
+            
+            {/* Step Indicators */}
+            <div className="flex items-center justify-between">
+              {steps.map((step, index) => {
+                const status = getStepStatus(step.id)
+                const StepIcon = step.icon
+                
+                return (
+                  <div key={step.id} className="flex flex-col items-center">
+                    <div className={`
+                      w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors cursor-pointer
+                      ${status === 'completed' ? 'bg-green-light border-green-light text-white' :
+                        status === 'current' ? 'bg-blue-light border-blue-light text-white' :
+                        'bg-background border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground/50'}
+                    `}
+                    onClick={() => goToStep(step.id)}
+                    >
+                      {status === 'completed' ? (
+                        <Check className="w-5 h-5" />
+                      ) : (
+                        <StepIcon className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div className="mt-2 text-center">
+                      <div className={`text-sm font-medium ${
+                        status === 'current' ? 'text-foreground' : 'text-muted-foreground'
+                      }`}>
+                        {step.title}
                       </div>
-                      <div className="mt-2 text-center">
-                        <div className={`text-sm font-medium ${
-                          status === 'current' ? 'text-foreground' : 'text-muted-foreground'
-                        }`}>
-                          {step.title}
-                        </div>
-                        <div className="text-xs text-muted-foreground hidden sm:block">
-                          {step.description}
-                        </div>
+                      <div className="text-xs text-muted-foreground hidden sm:block">
+                        {step.description}
                       </div>
                     </div>
-                  )
-                })}
-              </div>
+                  </div>
+                )
+              })}
             </div>
-
-            {/* Offline Warning */}
-            {!isOnline && (
-              <Alert className="mb-6">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  You're currently offline. Your changes will be saved locally and synced when you reconnect.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {/* Form Content */}
-            <Card>
-              <CardContent className="p-8">
-                {renderStepContent()}
-              </CardContent>
-            </Card>
-
-            {/* Navigation Buttons */}
-            <div className="flex items-center justify-between mt-8">
-              <Button
-                variant="outline"
-                onClick={previousStep}
-                disabled={!canGoToPrevious}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Previous
-              </Button>
-
-              <div className="flex items-center gap-3">
-                {currentStep === totalSteps ? (
-                  <>
-                    <Button variant="outline" onClick={handleManualSave} disabled={isAutoSaving}>
-                      <Save className="w-4 h-4 mr-2" />
-                      Save as Draft
-                    </Button>
-                    <Button onClick={handleSubmit} disabled={!canProceedToNext || isSubmitting}>
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Submitting...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4 mr-2" />
-                          Send Proposal
-                        </>
-                      )}
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    onClick={handleNext}
-                    disabled={!canProceedToNext}
-                  >
-                    Next
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            {/* Validation Message */}
-            {!canProceedToNext && Object.keys(stepErrors[currentStep] || {}).length > 0 && (
-              <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                <div className="flex items-center space-x-2">
-                  <AlertCircle className="w-4 h-4 text-yellow-600" />
-                  <span className="text-sm text-yellow-700 dark:text-yellow-300">
-                    Please fix the validation errors above before proceeding to the next step.
-                  </span>
-                </div>
-              </div>
-            )}
           </div>
-        </main>
+
+          {/* Offline Warning */}
+          {!isOnline && (
+            <Alert className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                You're currently offline. Your changes will be saved locally and synced when you reconnect.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Form Content */}
+          <Card>
+            <CardContent className="p-8">
+              {renderStepContent()}
+            </CardContent>
+          </Card>
+
+          {/* Navigation Buttons */}
+          <div className="flex items-center justify-between mt-8">
+            <Button
+              variant="outline"
+              onClick={previousStep}
+              disabled={!canGoToPrevious}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Previous
+            </Button>
+
+            <div className="flex items-center gap-3">
+              {currentStep === totalSteps ? (
+                <>
+                  <Button variant="outline" onClick={handleManualSave} disabled={isAutoSaving}>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save as Draft
+                  </Button>
+                  <Button onClick={handleSubmit} disabled={!canProceedToNext || isSubmitting}>
+                    {isSubmitting ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        Send Proposal
+                      </>
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={handleNext}
+                  disabled={!canProceedToNext}
+                >
+                  Next
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Validation Message */}
+          {!canProceedToNext && Object.keys(stepErrors[currentStep] || {}).length > 0 && (
+            <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+              <div className="flex items-center space-x-2">
+                <AlertCircle className="w-4 h-4 text-yellow-600" />
+                <span className="text-sm text-yellow-700 dark:text-yellow-300">
+                  Please fix the validation errors above before proceeding to the next step.
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </AppLayout>
   )
 }
