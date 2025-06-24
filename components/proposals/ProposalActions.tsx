@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
@@ -45,7 +43,8 @@ import {
   CheckCircle, 
   XCircle,
   Calendar,
-  Loader2
+  Loader2,
+  Mail
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Proposal } from '@/types/proposals';
@@ -53,8 +52,8 @@ import { useUpdateProposal } from '@/hooks/useUpdateProposal';
 import { useDeleteProposal } from '@/hooks/useDeleteProposal';
 import { duplicateProposal } from '@/lib/proposals/duplicate';
 import { generateProposalPDF } from '@/lib/proposals/pdf-generator';
-import { sendProposalEmail } from '@/lib/proposals/email-sender';
 import { generateShareLink, copyToClipboard } from '@/lib/proposals/share-link';
+import { EmailCompositionModal } from './EmailCompositionModal';
 
 interface ProposalActionsProps {
   proposal: Proposal;
@@ -83,22 +82,16 @@ export function ProposalActions({
 
   // Dialog states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [sendDialogOpen, setSendDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   
   // Loading states
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
   
   // Form states
-  const [emailData, setEmailData] = useState({
-    recipientEmail: proposal.clientName ? `${proposal.clientName.toLowerCase().replace(/\s+/g, '.')}@example.com` : '',
-    subject: `Proposal: ${proposal.title}`,
-    message: `Dear ${proposal.clientName},\n\nI'm pleased to share this proposal with you. Please review it at your earliest convenience.\n\nBest regards,`
-  });
   const [shareLink, setShareLink] = useState('');
   const [expiryDays, setExpiryDays] = useState(30);
   const [duplicateTitle, setDuplicateTitle] = useState(`${proposal.title} (Copy)`);
@@ -124,35 +117,6 @@ export function ProposalActions({
     } catch (error) {
       toast.error('Failed to delete proposal');
       console.error('Delete error:', error);
-    }
-  };
-
-  // Handle send action
-  const handleSend = async () => {
-    try {
-      setIsSendingEmail(true);
-      
-      // First update the proposal status to 'sent'
-      const updatedProposal = await sendProposal(proposal.id);
-      
-      // Then send the email
-      await sendProposalEmail({
-        to: emailData.recipientEmail,
-        subject: emailData.subject,
-        message: emailData.message,
-        proposalId: proposal.id,
-        proposalTitle: proposal.title,
-        clientName: proposal.clientName
-      });
-      
-      toast.success('Proposal sent successfully');
-      setSendDialogOpen(false);
-      onActionComplete?.();
-    } catch (error) {
-      toast.error('Failed to send proposal');
-      console.error('Send error:', error);
-    } finally {
-      setIsSendingEmail(false);
     }
   };
 
@@ -211,6 +175,12 @@ export function ProposalActions({
     }
   };
 
+  // Handle email send success
+  const handleEmailSendSuccess = () => {
+    toast.success('Email sent successfully');
+    onActionComplete?.();
+  };
+
   // Determine which actions are available based on proposal status
   const canEdit = proposal.status === 'draft';
   const canSend = proposal.status === 'draft';
@@ -218,6 +188,7 @@ export function ProposalActions({
   const canDuplicate = true; // Allow duplicate for all statuses
   const canExport = true; // Allow export for all statuses
   const canShare = proposal.status !== 'draft'; // Only share non-draft proposals
+  const canEmail = true; // Allow email for all statuses
 
   // Dropdown menu variant
   if (variant === 'dropdown') {
@@ -250,10 +221,10 @@ export function ProposalActions({
               </DropdownMenuItem>
             )}
             
-            {canSend && (
-              <DropdownMenuItem onClick={() => setSendDialogOpen(true)}>
-                <Send className="mr-2 h-4 w-4" />
-                Send to Client
+            {canEmail && (
+              <DropdownMenuItem onClick={() => setEmailDialogOpen(true)}>
+                <Mail className="mr-2 h-4 w-4" />
+                Send Email
               </DropdownMenuItem>
             )}
             
@@ -325,67 +296,6 @@ export function ProposalActions({
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-
-        {/* Send Proposal Dialog */}
-        <Dialog open={sendDialogOpen} onOpenChange={setSendDialogOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Send Proposal</DialogTitle>
-              <DialogDescription>
-                Send this proposal directly to your client via email.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="recipient">Recipient Email</Label>
-                <Input 
-                  id="recipient" 
-                  value={emailData.recipientEmail}
-                  onChange={(e) => setEmailData({...emailData, recipientEmail: e.target.value})}
-                  placeholder="client@example.com"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
-                <Input 
-                  id="subject" 
-                  value={emailData.subject}
-                  onChange={(e) => setEmailData({...emailData, subject: e.target.value})}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
-                <Textarea 
-                  id="message" 
-                  value={emailData.message}
-                  onChange={(e) => setEmailData({...emailData, message: e.target.value})}
-                  rows={4}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setSendDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleSend}
-                disabled={isSendingEmail || !emailData.recipientEmail}
-              >
-                {isSendingEmail ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <Send className="mr-2 h-4 w-4" />
-                    Send Proposal
-                  </>
-                )}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
 
         {/* Share Link Dialog */}
         <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
@@ -503,6 +413,14 @@ export function ProposalActions({
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Email Composition Modal */}
+        <EmailCompositionModal
+          proposal={proposal}
+          isOpen={emailDialogOpen}
+          onOpenChange={setEmailDialogOpen}
+          onSendSuccess={handleEmailSendSuccess}
+        />
       </>
     );
   }
@@ -530,14 +448,14 @@ export function ProposalActions({
         </Button>
       )}
       
-      {canSend && (
+      {canEmail && (
         <Button
           variant="default"
           size={size}
-          onClick={() => setSendDialogOpen(true)}
+          onClick={() => setEmailDialogOpen(true)}
         >
-          <Send className="mr-2 h-4 w-4" />
-          Send
+          <Mail className="mr-2 h-4 w-4" />
+          Send Email
         </Button>
       )}
       
@@ -621,66 +539,6 @@ export function ProposalActions({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <Dialog open={sendDialogOpen} onOpenChange={setSendDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Send Proposal</DialogTitle>
-            <DialogDescription>
-              Send this proposal directly to your client via email.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="recipient">Recipient Email</Label>
-              <Input 
-                id="recipient" 
-                value={emailData.recipientEmail}
-                onChange={(e) => setEmailData({...emailData, recipientEmail: e.target.value})}
-                placeholder="client@example.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="subject">Subject</Label>
-              <Input 
-                id="subject" 
-                value={emailData.subject}
-                onChange={(e) => setEmailData({...emailData, subject: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="message">Message</Label>
-              <Textarea 
-                id="message" 
-                value={emailData.message}
-                onChange={(e) => setEmailData({...emailData, message: e.target.value})}
-                rows={4}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setSendDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleSend}
-              disabled={isSendingEmail || !emailData.recipientEmail}
-            >
-              {isSendingEmail ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="mr-2 h-4 w-4" />
-                  Send Proposal
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
         <DialogContent className="sm:max-w-md">
@@ -796,6 +654,14 @@ export function ProposalActions({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Email Composition Modal */}
+      <EmailCompositionModal
+        proposal={proposal}
+        isOpen={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+        onSendSuccess={handleEmailSendSuccess}
+      />
     </div>
   );
 }
