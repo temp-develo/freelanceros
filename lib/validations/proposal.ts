@@ -42,7 +42,7 @@ export const technicalSpecsSchema = z.object({
     .max(10, 'Please select no more than 10 technologies'),
   integrations: z.array(z.string())
     .min(1, 'Please select at least one integration')
-    .max(8, 'Please select no more than 8 integrations'),
+    .max(10, 'Please select no more than 10 integrations'),
   timeline: z.string()
     .min(1, 'Please select a development timeline')
 })
