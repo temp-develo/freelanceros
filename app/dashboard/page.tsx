@@ -25,6 +25,12 @@ import {
   QuickActionSkeleton,
 } from '@/components/ui/dashboard-skeletons'
 import {
+  EmptyActivity,
+  EmptyDeadlines,
+  EmptyProposals,
+  EmptyProjects
+} from '@/components/ui/empty-states'
+import {
   Home,
   FileText,
   FolderOpen,
@@ -201,6 +207,17 @@ export default function DashboardPage() {
     await refetchAll()
   }
 
+  // Empty state handlers
+  const handleCreateProposal = () => {
+    console.log('Create proposal clicked')
+    // TODO: Navigate to proposal creation
+  }
+
+  const handleCreateProject = () => {
+    console.log('Create project clicked')
+    // TODO: Navigate to project creation
+  }
+
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -312,7 +329,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Quick Actions */}
-            <Button size="sm" className="hidden sm:flex">
+            <Button size="sm" className="hidden sm:flex" onClick={handleCreateProject}>
               <Plus className="w-4 h-4 mr-2" />
               New Project
             </Button>
@@ -566,10 +583,7 @@ export default function DashboardPage() {
                       </Alert>
                     ) : (
                       // Show empty state
-                      <div className="text-center py-8">
-                        <Activity className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">No recent activity to display</p>
-                      </div>
+                      <EmptyActivity showCard={false} />
                     )}
                     
                     {activity.hasMore && (
@@ -709,10 +723,10 @@ export default function DashboardPage() {
                       </Alert>
                     ) : (
                       // Show empty state
-                      <div className="text-center py-8">
-                        <Target className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">No upcoming deadlines</p>
-                      </div>
+                      <EmptyDeadlines 
+                        showCard={false} 
+                        onCreateProject={handleCreateProject}
+                      />
                     )}
                     
                     <div className="mt-4 pt-4 border-t">
