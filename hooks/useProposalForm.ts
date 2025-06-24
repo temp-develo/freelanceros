@@ -102,7 +102,13 @@ export function useProposalForm(options: UseProposalFormOptions = {}): UsePropos
   // Initialize form with React Hook Form
   const form = useForm<CompleteProposalData>({
     resolver: zodResolver(completeProposalSchema),
-    defaultValues: { ...defaultFormData, ...initialData },
+    defaultValues: { 
+      ...defaultFormData, 
+      ...initialData,
+      // Ensure arrays are initialized properly
+      techStack: initialData.techStack || [],
+      integrations: initialData.integrations || []
+    },
     mode: 'onChange'
   })
 

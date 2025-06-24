@@ -981,7 +981,7 @@ export default function NewProposalPage() {
                 return (
                   <div key={step.id} className="flex flex-col items-center">
                     <div className={`
-                      w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors cursor-pointer
+                      w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all cursor-pointer
                       ${status === 'completed' ? 'bg-green-light border-green-light text-white' :
                         status === 'current' ? 'bg-blue-light border-blue-light text-white' :
                         'bg-background border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground/50'}
