@@ -623,11 +623,11 @@ export default function NewProposalPage() {
                               type="checkbox"
                               checked={field.value?.includes(tech) || false}
                               onChange={(e) => {
-                                const currentValue = field.value || []
+                                const currentValue = field.value || [];
                                 if (e.target.checked) {
-                                  field.onChange([...currentValue, tech])
+                                  field.onChange([...currentValue, tech]);
                                 } else {
-                                  field.onChange(currentValue.filter(item => item !== tech))
+                                  field.onChange(currentValue.filter(item => item !== tech));
                                 }
                               }}
                               className="rounded border-gray-300"
@@ -655,11 +655,11 @@ export default function NewProposalPage() {
                               type="checkbox"
                               checked={field.value?.includes(integration) || false}
                               onChange={(e) => {
-                                const currentValue = field.value || []
+                                const currentValue = field.value || [];
                                 if (e.target.checked) {
-                                  field.onChange([...currentValue, integration])
+                                  field.onChange([...currentValue, integration]);
                                 } else {
-                                  field.onChange(currentValue.filter(item => item !== integration))
+                                  field.onChange(currentValue.filter(item => item !== integration));
                                 }
                               }}
                               className="rounded border-gray-300"
