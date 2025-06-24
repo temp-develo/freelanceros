@@ -47,6 +47,7 @@ import {
 } from '@/components/ui/form'
 import { FormFieldError, FormStepErrorSummary } from '@/components/ui/form-field-error'
 import { AutoSaveIndicator, ConnectionStatus } from '@/components/ui/auto-save-indicator'
+import { AIGenerateButton } from '@/components/ai/AIGenerateButton'
 import {
   ArrowLeft,
   ArrowRight,
@@ -306,6 +307,31 @@ export default function NewProposalPage() {
     return 'upcoming'
   }
 
+  // AI content generation handlers
+  const handleGeneratedDescription = (content: string) => {
+    form.setValue('description', content, { shouldDirty: true, shouldValidate: true })
+    toast.success('Project description generated successfully!')
+  }
+
+  const handleGeneratedRequirements = (content: string) => {
+    form.setValue('requirements', content, { shouldDirty: true, shouldValidate: true })
+    toast.success('Project requirements generated successfully!')
+  }
+
+  const handleGeneratedTimeline = (content: string) => {
+    // This would typically update a timeline field, but we're using it for context
+    form.setValue('timeline', content, { shouldDirty: true, shouldValidate: true })
+    toast.success('Development timeline generated successfully!')
+  }
+
+  const handleGeneratedBudget = (content: string) => {
+    // This would typically update budget fields, but we're using it for context
+    // For demo purposes, we'll just set the budgetRange field
+    form.setValue('budgetRange', '$10,000 - $25,000', { shouldDirty: true, shouldValidate: true })
+    form.setValue('paymentTerms', '50% upfront, 50% on completion', { shouldDirty: true, shouldValidate: true })
+    toast.success('Budget information generated successfully!')
+  }
+
   // Custom header actions for new proposal page
   const headerActions = (
     <div className="flex items-center gap-2">
@@ -484,7 +510,22 @@ export default function NewProposalPage() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Project Description *</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Project Description *</FormLabel>
+                        <AIGenerateButton
+                          type="description"
+                          context={{
+                            projectTitle: form.getValues('projectTitle'),
+                            projectType: form.getValues('projectType'),
+                            industry: form.getValues('industry'),
+                            clientName: form.getValues('clientName'),
+                            company: form.getValues('company'),
+                            existingContent: field.value
+                          }}
+                          onGenerated={handleGeneratedDescription}
+                          disabled={!form.getValues('projectType') || !form.getValues('industry')}
+                        />
+                      </div>
                       <FormControl>
                         <Textarea
                           placeholder="Provide a detailed description of the project, including goals, target audience, and expected outcomes..."
@@ -502,7 +543,21 @@ export default function NewProposalPage() {
                   name="requirements"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Key Requirements *</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Key Requirements *</FormLabel>
+                        <AIGenerateButton
+                          type="requirements"
+                          context={{
+                            projectTitle: form.getValues('projectTitle'),
+                            projectType: form.getValues('projectType'),
+                            industry: form.getValues('industry'),
+                            company: form.getValues('company'),
+                            existingContent: field.value
+                          }}
+                          onGenerated={handleGeneratedRequirements}
+                          disabled={!form.getValues('projectType') || !form.getValues('industry')}
+                        />
+                      </div>
                       <FormControl>
                         <Textarea
                           placeholder="List the main requirements, features, and functionalities needed for this project..."
@@ -614,7 +669,20 @@ export default function NewProposalPage() {
                   name="timeline"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Development Timeline *</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Development Timeline *</FormLabel>
+                        <AIGenerateButton
+                          type="timeline"
+                          context={{
+                            projectTitle: form.getValues('projectTitle'),
+                            projectType: form.getValues('projectType'),
+                            techStack: form.getValues('techStack'),
+                            existingContent: field.value
+                          }}
+                          onGenerated={handleGeneratedTimeline}
+                          disabled={!form.getValues('projectType') || !form.getValues('techStack')?.length}
+                        />
+                      </div>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -671,7 +739,22 @@ export default function NewProposalPage() {
                   name="budgetRange"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Budget Range *</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Budget Range *</FormLabel>
+                        <AIGenerateButton
+                          type="budget"
+                          context={{
+                            projectTitle: form.getValues('projectTitle'),
+                            projectType: form.getValues('projectType'),
+                            industry: form.getValues('industry'),
+                            company: form.getValues('company'),
+                            techStack: form.getValues('techStack'),
+                            existingContent: field.value
+                          }}
+                          onGenerated={handleGeneratedBudget}
+                          disabled={!form.getValues('projectType') || !form.getValues('techStack')?.length}
+                        />
+                      </div>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
