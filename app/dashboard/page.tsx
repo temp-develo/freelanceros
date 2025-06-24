@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -17,6 +17,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  StatCardSkeleton,
+  ActivityItemSkeleton,
+  DeadlineItemSkeleton,
+  QuickActionSkeleton,
+  CardSkeleton
+} from '@/components/ui/dashboard-skeletons'
 import {
   Home,
   FileText,
@@ -230,6 +237,42 @@ const quickActions = [
 export default function DashboardPage() {
   const { user, signOut } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  
+  // Loading states for different sections
+  const [isLoadingStats, setIsLoadingStats] = useState(true)
+  const [isLoadingActivity, setIsLoadingActivity] = useState(true)
+  const [isLoadingQuickActions, setIsLoadingQuickActions] = useState(true)
+  const [isLoadingDeadlines, setIsLoadingDeadlines] = useState(true)
+
+  // Simulate data loading with different timing for each section
+  useEffect(() => {
+    // Stats cards load first (2 seconds)
+    const statsTimer = setTimeout(() => {
+      setIsLoadingStats(false)
+    }, 2000)
+
+    // Activity loads slightly later (2.5 seconds)
+    const activityTimer = setTimeout(() => {
+      setIsLoadingActivity(false)
+    }, 2500)
+
+    // Quick actions load next (3 seconds)
+    const quickActionsTimer = setTimeout(() => {
+      setIsLoadingQuickActions(false)
+    }, 3000)
+
+    // Deadlines load last (3.5 seconds)
+    const deadlinesTimer = setTimeout(() => {
+      setIsLoadingDeadlines(false)
+    }, 3500)
+
+    return () => {
+      clearTimeout(statsTimer)
+      clearTimeout(activityTimer)
+      clearTimeout(quickActionsTimer)
+      clearTimeout(deadlinesTimer)
+    }
+  }, [])
 
   const handleSignOut = async () => {
     await signOut()
@@ -408,39 +451,47 @@ export default function DashboardPage() {
 
             {/* Stats Cards Grid */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 mb-8">
-              {statsCards.map((card) => (
-                <Card key={card.title} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
-                      {card.title}
-                    </CardTitle>
-                    <div className={`p-2 rounded-lg bg-${card.color}-light/10 group-hover:bg-${card.color}-light/20 transition-colors`}>
-                      <card.icon className={`h-4 w-4 text-${card.color}-light`} />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold mb-1">{card.value}</div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-1 text-xs">
-                        {card.changeType === 'positive' ? (
-                          <ArrowUpRight className="w-3 h-3 text-green-light" />
-                        ) : (
-                          <ArrowDownRight className="w-3 h-3 text-red-light" />
-                        )}
-                        <span className={`font-medium ${
-                          card.changeType === 'positive' ? 'text-green-light' : 'text-red-light'
-                        }`}>
-                          {card.changePercent}
-                        </span>
+              {isLoadingStats ? (
+                // Show skeleton loading state
+                Array.from({ length: 4 }).map((_, index) => (
+                  <StatCardSkeleton key={index} />
+                ))
+              ) : (
+                // Show actual stats cards
+                statsCards.map((card) => (
+                  <Card key={card.title} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium text-muted-foreground">
+                        {card.title}
+                      </CardTitle>
+                      <div className={`p-2 rounded-lg bg-${card.color}-light/10 group-hover:bg-${card.color}-light/20 transition-colors`}>
+                        <card.icon className={`h-4 w-4 text-${card.color}-light`} />
                       </div>
-                      <span className="text-xs text-muted-foreground">{card.description}</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {card.change} {card.description}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold mb-1">{card.value}</div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-1 text-xs">
+                          {card.changeType === 'positive' ? (
+                            <ArrowUpRight className="w-3 h-3 text-green-light" />
+                          ) : (
+                            <ArrowDownRight className="w-3 h-3 text-red-light" />
+                          )}
+                          <span className={`font-medium ${
+                            card.changeType === 'positive' ? 'text-green-light' : 'text-red-light'
+                          }`}>
+                            {card.changePercent}
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">{card.description}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {card.change} {card.description}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
 
             {/* Main Dashboard Grid */}
@@ -463,20 +514,30 @@ export default function DashboardPage() {
                     </Button>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {recentActivities.map((activity, index) => (
-                        <div key={index} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className={`p-2 rounded-lg bg-${activity.color}-light/10`}>
-                            <activity.icon className={`w-4 h-4 text-${activity.color}-light`} />
+                    {isLoadingActivity ? (
+                      // Show skeleton loading state
+                      <div className="space-y-4">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <ActivityItemSkeleton key={index} />
+                        ))}
+                      </div>
+                    ) : (
+                      // Show actual activity items
+                      <div className="space-y-4">
+                        {recentActivities.map((activity, index) => (
+                          <div key={index} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                            <div className={`p-2 rounded-lg bg-${activity.color}-light/10`}>
+                              <activity.icon className={`w-4 h-4 text-${activity.color}-light`} />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                              <p className="text-sm font-medium">{activity.title}</p>
+                              <p className="text-xs text-muted-foreground">{activity.description}</p>
+                            </div>
+                            <span className="text-xs text-muted-foreground">{activity.time}</span>
                           </div>
-                          <div className="flex-1 space-y-1">
-                            <p className="text-sm font-medium">{activity.title}</p>
-                            <p className="text-xs text-muted-foreground">{activity.description}</p>
-                          </div>
-                          <span className="text-xs text-muted-foreground">{activity.time}</span>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                     <div className="mt-4 pt-4 border-t">
                       <Button variant="outline" className="w-full">
                         View All Activity
@@ -499,22 +560,30 @@ export default function DashboardPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    {quickActions.map((action, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        className="w-full justify-start h-auto p-4 hover:shadow-md transition-all"
-                        onClick={() => handleQuickAction(action.action)}
-                      >
-                        <div className={`p-2 rounded-lg bg-${action.color}-light/10 mr-3`}>
-                          <action.icon className={`w-4 h-4 text-${action.color}-light`} />
-                        </div>
-                        <div className="text-left">
-                          <div className="font-medium text-sm">{action.title}</div>
-                          <div className="text-xs text-muted-foreground">{action.description}</div>
-                        </div>
-                      </Button>
-                    ))}
+                    {isLoadingQuickActions ? (
+                      // Show skeleton loading state
+                      Array.from({ length: 4 }).map((_, index) => (
+                        <QuickActionSkeleton key={index} />
+                      ))
+                    ) : (
+                      // Show actual quick actions
+                      quickActions.map((action, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          className="w-full justify-start h-auto p-4 hover:shadow-md transition-all"
+                          onClick={() => handleQuickAction(action.action)}
+                        >
+                          <div className={`p-2 rounded-lg bg-${action.color}-light/10 mr-3`}>
+                            <action.icon className={`w-4 h-4 text-${action.color}-light`} />
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium text-sm">{action.title}</div>
+                            <div className="text-xs text-muted-foreground">{action.description}</div>
+                          </div>
+                        </Button>
+                      ))
+                    )}
                   </CardContent>
                 </Card>
 
@@ -530,45 +599,55 @@ export default function DashboardPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {upcomingDeadlines.map((deadline, index) => (
-                        <div key={index} className="space-y-3 p-3 border rounded-lg hover:shadow-sm transition-shadow">
-                          <div className="flex items-start justify-between">
+                    {isLoadingDeadlines ? (
+                      // Show skeleton loading state
+                      <div className="space-y-4">
+                        {Array.from({ length: 4 }).map((_, index) => (
+                          <DeadlineItemSkeleton key={index} />
+                        ))}
+                      </div>
+                    ) : (
+                      // Show actual deadline items
+                      <div className="space-y-4">
+                        {upcomingDeadlines.map((deadline, index) => (
+                          <div key={index} className="space-y-3 p-3 border rounded-lg hover:shadow-sm transition-shadow">
+                            <div className="flex items-start justify-between">
+                              <div className="space-y-1">
+                                <p className="font-medium text-sm">{deadline.project}</p>
+                                <p className="text-xs text-muted-foreground">{deadline.client}</p>
+                                <p className="text-xs">{deadline.task}</p>
+                              </div>
+                              <div className="text-right">
+                                <Badge 
+                                  variant={
+                                    deadline.priority === 'high' ? 'destructive' :
+                                    deadline.priority === 'medium' ? 'secondary' : 'outline'
+                                  }
+                                  className="text-xs"
+                                >
+                                  {deadline.daysLeft}d left
+                                </Badge>
+                              </div>
+                            </div>
                             <div className="space-y-1">
-                              <p className="font-medium text-sm">{deadline.project}</p>
-                              <p className="text-xs text-muted-foreground">{deadline.client}</p>
-                              <p className="text-xs">{deadline.task}</p>
-                            </div>
-                            <div className="text-right">
-                              <Badge 
-                                variant={
-                                  deadline.priority === 'high' ? 'destructive' :
-                                  deadline.priority === 'medium' ? 'secondary' : 'outline'
-                                }
-                                className="text-xs"
-                              >
-                                {deadline.daysLeft}d left
-                              </Badge>
-                            </div>
-                          </div>
-                          <div className="space-y-1">
-                            <div className="flex justify-between text-xs">
-                              <span>Progress</span>
-                              <span>{deadline.progress}%</span>
-                            </div>
-                            <div className="w-full bg-muted rounded-full h-1.5">
-                              <div 
-                                className={`h-1.5 rounded-full transition-all ${
-                                  deadline.priority === 'high' ? 'bg-red-light' :
-                                  deadline.priority === 'medium' ? 'bg-yellow' : 'bg-green-light'
-                                }`}
-                                style={{ width: `${deadline.progress}%` }}
-                              />
+                              <div className="flex justify-between text-xs">
+                                <span>Progress</span>
+                                <span>{deadline.progress}%</span>
+                              </div>
+                              <div className="w-full bg-muted rounded-full h-1.5">
+                                <div 
+                                  className={`h-1.5 rounded-full transition-all ${
+                                    deadline.priority === 'high' ? 'bg-red-light' :
+                                    deadline.priority === 'medium' ? 'bg-yellow' : 'bg-green-light'
+                                  }`}
+                                  style={{ width: `${deadline.progress}%` }}
+                                />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                     <div className="mt-4 pt-4 border-t">
                       <Button variant="outline" className="w-full">
                         <Calendar className="w-4 h-4 mr-2" />
