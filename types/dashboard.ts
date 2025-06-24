@@ -119,12 +119,13 @@ export interface Invoice {
   updatedAt: string
 }
 
-// Hook return types
+// Hook return types with real-time support
 export interface UseDashboardStatsReturn {
   stats: DashboardStats | null
   loading: boolean
   error: Error | null
   refetch: () => Promise<void>
+  refetchSilent?: () => Promise<void>
 }
 
 export interface UseRecentActivityReturn {
@@ -132,6 +133,7 @@ export interface UseRecentActivityReturn {
   loading: boolean
   error: Error | null
   refetch: () => Promise<void>
+  refetchSilent?: () => Promise<void>
   hasMore: boolean
   loadMore: () => Promise<void>
 }
@@ -141,8 +143,15 @@ export interface UseUpcomingDeadlinesReturn {
   loading: boolean
   error: Error | null
   refetch: () => Promise<void>
+  refetchSilent?: () => Promise<void>
   overdueTasks: number
   urgentTasks: number
+}
+
+// Real-time subscription types
+export interface RealtimeSubscriptionStatus {
+  isConnected: boolean
+  activeSubscriptions: number
 }
 
 // API response types

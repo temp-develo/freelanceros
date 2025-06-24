@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 import type { UpcomingDeadline, UseUpcomingDeadlinesReturn } from '@/types/dashboard'
@@ -12,15 +12,19 @@ export function useUpcomingDeadlines(limit: number = 10): UseUpcomingDeadlinesRe
   const [error, setError] = useState<Error | null>(null)
   const [overdueTasks, setOverdueTasks] = useState(0)
   const [urgentTasks, setUrgentTasks] = useState(0)
+  const fetchingRef = useRef(false)
 
-  const fetchDeadlines = useCallback(async () => {
-    if (!user) {
-      setLoading(false)
+  const fetchDeadlines = useCallback(async (skipLoading = false) => {
+    if (!user || fetchingRef.current) {
+      if (!user) setLoading(false)
       return
     }
 
     try {
-      setLoading(true)
+      fetchingRef.current = true
+      if (!skipLoading) {
+        setLoading(true)
+      }
       setError(null)
 
       const now = new Date()
@@ -198,15 +202,21 @@ export function useUpcomingDeadlines(limit: number = 10): UseUpcomingDeadlinesRe
       setError(err instanceof Error ? err : new Error('Failed to fetch upcoming deadlines'))
     } finally {
       setLoading(false)
+      fetchingRef.current = false
     }
   }, [user, limit])
 
   const refetch = useCallback(async () => {
-    await fetchDeadlines()
+    await fetchDeadlines(false)
+  }, [fetchDeadlines])
+
+  // Optimized refetch for real-time updates (skip loading state)
+  const refetchSilent = useCallback(async () => {
+    await fetchDeadlines(true)
   }, [fetchDeadlines])
 
   useEffect(() => {
-    fetchDeadlines()
+    fetchDeadlines(false)
   }, [fetchDeadlines])
 
   return {
@@ -214,6 +224,7 @@ export function useUpcomingDeadlines(limit: number = 10): UseUpcomingDeadlinesRe
     loading,
     error,
     refetch,
+    refetchSilent,
     overdueTasks,
     urgentTasks
   }

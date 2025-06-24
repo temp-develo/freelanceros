@@ -55,7 +55,9 @@ import {
   RefreshCw,
   AlertTriangle,
   Mail,
-  Phone
+  Phone,
+  Wifi,
+  WifiOff
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -175,11 +177,12 @@ export default function DashboardPage() {
   const { user, signOut } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   
-  // Use the combined dashboard hook
+  // Use the combined dashboard hook with real-time updates
   const {
     stats,
     activity,
     deadlines,
+    realtime,
     isLoading,
     hasError,
     refetchAll
@@ -293,6 +296,21 @@ export default function DashboardPage() {
 
           {/* Header Actions */}
           <div className="flex items-center gap-x-4 lg:gap-x-6">
+            {/* Real-time Status Indicator */}
+            <div className="flex items-center gap-2">
+              {realtime.isConnected ? (
+                <div className="flex items-center gap-1 text-xs text-green-600">
+                  <Wifi className="w-3 h-3" />
+                  <span className="hidden sm:inline">Live</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <WifiOff className="w-3 h-3" />
+                  <span className="hidden sm:inline">Offline</span>
+                </div>
+              )}
+            </div>
+
             {/* Quick Actions */}
             <Button size="sm" className="hidden sm:flex">
               <Plus className="w-4 h-4 mr-2" />
@@ -358,10 +376,31 @@ export default function DashboardPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground mt-2">
-                Welcome back! Here's what's happening with your freelance business.
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                  <p className="text-muted-foreground mt-2">
+                    Welcome back! Here's what's happening with your freelance business.
+                  </p>
+                </div>
+                {/* Real-time Status */}
+                <div className="flex items-center gap-2 text-sm">
+                  {realtime.isConnected ? (
+                    <div className="flex items-center gap-2 text-green-600">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span>Live updates active</span>
+                      <Badge variant="outline" className="text-xs">
+                        {realtime.activeSubscriptions} subscriptions
+                      </Badge>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                      <span>Offline mode</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Error State */}
@@ -474,6 +513,9 @@ export default function DashboardPage() {
                       <CardTitle className="flex items-center">
                         <Activity className="w-5 h-5 mr-2 text-blue-light" />
                         Recent Activity
+                        {realtime.isConnected && (
+                          <div className="ml-2 w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        )}
                       </CardTitle>
                       <CardDescription>
                         Your latest business activities and updates
@@ -585,6 +627,9 @@ export default function DashboardPage() {
                       <div className="flex items-center">
                         <Target className="w-5 h-5 mr-2 text-red-light" />
                         Upcoming Deadlines
+                        {realtime.isConnected && (
+                          <div className="ml-2 w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        )}
                       </div>
                       {deadlines.overdueTasks > 0 && (
                         <Badge variant="destructive" className="text-xs">

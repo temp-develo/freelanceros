@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 import type { DashboardStats, UseDashboardStatsReturn } from '@/types/dashboard'
@@ -10,15 +10,19 @@ export function useDashboardStats(): UseDashboardStatsReturn {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const fetchingRef = useRef(false)
 
-  const fetchStats = useCallback(async () => {
-    if (!user) {
-      setLoading(false)
+  const fetchStats = useCallback(async (skipLoading = false) => {
+    if (!user || fetchingRef.current) {
+      if (!user) setLoading(false)
       return
     }
 
     try {
-      setLoading(true)
+      fetchingRef.current = true
+      if (!skipLoading) {
+        setLoading(true)
+      }
       setError(null)
 
       // Get current date ranges for comparison
@@ -140,21 +144,28 @@ export function useDashboardStats(): UseDashboardStatsReturn {
       setError(err instanceof Error ? err : new Error('Failed to fetch dashboard stats'))
     } finally {
       setLoading(false)
+      fetchingRef.current = false
     }
   }, [user])
 
   const refetch = useCallback(async () => {
-    await fetchStats()
+    await fetchStats(false)
+  }, [fetchStats])
+
+  // Optimized refetch for real-time updates (skip loading state)
+  const refetchSilent = useCallback(async () => {
+    await fetchStats(true)
   }, [fetchStats])
 
   useEffect(() => {
-    fetchStats()
+    fetchStats(false)
   }, [fetchStats])
 
   return {
     stats,
     loading,
     error,
-    refetch
+    refetch,
+    refetchSilent
   }
 }

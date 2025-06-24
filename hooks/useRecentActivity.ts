@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 import type { RecentActivity, UseRecentActivityReturn } from '@/types/dashboard'
@@ -12,15 +12,17 @@ export function useRecentActivity(limit: number = 10): UseRecentActivityReturn {
   const [error, setError] = useState<Error | null>(null)
   const [hasMore, setHasMore] = useState(true)
   const [offset, setOffset] = useState(0)
+  const fetchingRef = useRef(false)
 
-  const fetchActivities = useCallback(async (isLoadMore = false) => {
-    if (!user) {
-      setLoading(false)
+  const fetchActivities = useCallback(async (isLoadMore = false, skipLoading = false) => {
+    if (!user || fetchingRef.current) {
+      if (!user) setLoading(false)
       return
     }
 
     try {
-      if (!isLoadMore) {
+      fetchingRef.current = true
+      if (!isLoadMore && !skipLoading) {
         setLoading(true)
         setError(null)
       }
@@ -205,22 +207,29 @@ export function useRecentActivity(limit: number = 10): UseRecentActivityReturn {
       setError(err instanceof Error ? err : new Error('Failed to fetch recent activity'))
     } finally {
       setLoading(false)
+      fetchingRef.current = false
     }
   }, [user, limit, offset])
 
   const refetch = useCallback(async () => {
     setOffset(0)
-    await fetchActivities(false)
+    await fetchActivities(false, false)
+  }, [fetchActivities])
+
+  // Optimized refetch for real-time updates (skip loading state)
+  const refetchSilent = useCallback(async () => {
+    setOffset(0)
+    await fetchActivities(false, true)
   }, [fetchActivities])
 
   const loadMore = useCallback(async () => {
     if (!loading && hasMore) {
-      await fetchActivities(true)
+      await fetchActivities(true, false)
     }
   }, [fetchActivities, loading, hasMore])
 
   useEffect(() => {
-    fetchActivities(false)
+    fetchActivities(false, false)
   }, [user, limit])
 
   return {
@@ -228,6 +237,7 @@ export function useRecentActivity(limit: number = 10): UseRecentActivityReturn {
     loading,
     error,
     refetch,
+    refetchSilent,
     hasMore,
     loadMore
   }
