@@ -15,7 +15,12 @@ import {
   Send,
   Calendar,
   CheckCircle,
-  Zap
+  Zap,
+  Search,
+  Filter,
+  FileCheck,
+  Briefcase,
+  Mail
 } from 'lucide-react'
 
 // Base empty state component with consistent styling
@@ -106,6 +111,275 @@ function EmptyProposals({
               Add portfolio samples to showcase your work
             </li>
           </ul>
+        </div>
+      </div>
+    </BaseEmptyState>
+  )
+
+  if (showCard) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="p-0">
+          {content}
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return content
+}
+
+// Empty Filtered Proposals Component
+interface EmptyFilteredProposalsProps {
+  className?: string
+  filter?: string
+  onClearFilter?: () => void
+  showCard?: boolean
+}
+
+function EmptyFilteredProposals({ 
+  className, 
+  filter,
+  onClearFilter,
+  showCard = true 
+}: EmptyFilteredProposalsProps) {
+  const content = (
+    <BaseEmptyState className={className}>
+      {/* Illustration */}
+      <div className="relative mb-6">
+        <div className="w-20 h-20 mx-auto bg-purple-light/10 rounded-full flex items-center justify-center mb-4">
+          <Filter className="w-10 h-10 text-purple-light" />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="space-y-4 max-w-md">
+        <div>
+          <h3 className="text-xl font-semibold text-foreground mb-2">
+            No matching proposals
+          </h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            {filter 
+              ? `No proposals match the "${filter}" filter. Try adjusting your filter criteria or create a new proposal.`
+              : 'No proposals match your current filters. Try adjusting your filter criteria or create a new proposal.'}
+          </p>
+        </div>
+
+        {/* Call to Action */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          {onClearFilter && (
+            <Button 
+              variant="outline"
+              onClick={onClearFilter}
+            >
+              Clear Filters
+            </Button>
+          )}
+          
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Create New Proposal
+          </Button>
+        </div>
+      </div>
+    </BaseEmptyState>
+  )
+
+  if (showCard) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="p-0">
+          {content}
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return content
+}
+
+// Empty Search Results Component
+interface EmptySearchResultsProps {
+  className?: string
+  searchQuery: string
+  onClearSearch?: () => void
+  showCard?: boolean
+}
+
+function EmptySearchResults({ 
+  className, 
+  searchQuery,
+  onClearSearch,
+  showCard = true 
+}: EmptySearchResultsProps) {
+  const content = (
+    <BaseEmptyState className={className}>
+      {/* Illustration */}
+      <div className="relative mb-6">
+        <div className="w-20 h-20 mx-auto bg-yellow/10 rounded-full flex items-center justify-center mb-4">
+          <Search className="w-10 h-10 text-yellow" />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="space-y-4 max-w-md">
+        <div>
+          <h3 className="text-xl font-semibold text-foreground mb-2">
+            No search results
+          </h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            No proposals match your search for "<span className="font-medium text-foreground">{searchQuery}</span>". 
+            Try using different keywords or check for typos.
+          </p>
+        </div>
+
+        {/* Call to Action */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          {onClearSearch && (
+            <Button 
+              variant="outline"
+              onClick={onClearSearch}
+            >
+              Clear Search
+            </Button>
+          )}
+          
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Create New Proposal
+          </Button>
+        </div>
+
+        {/* Search Tips */}
+        <div className="mt-4 p-4 bg-muted/50 rounded-lg text-left">
+          <div className="flex items-center mb-2">
+            <Lightbulb className="w-4 h-4 text-yellow mr-2" />
+            <span className="text-sm font-medium">Search Tips</span>
+          </div>
+          <ul className="space-y-1 text-xs text-muted-foreground">
+            <li className="flex items-start">
+              <span className="w-1 h-1 bg-muted-foreground rounded-full mt-2 mr-2 flex-shrink-0"></span>
+              Try searching by client name, proposal title, or description
+            </li>
+            <li className="flex items-start">
+              <span className="w-1 h-1 bg-muted-foreground rounded-full mt-2 mr-2 flex-shrink-0"></span>
+              Use shorter, more general terms
+            </li>
+            <li className="flex items-start">
+              <span className="w-1 h-1 bg-muted-foreground rounded-full mt-2 mr-2 flex-shrink-0"></span>
+              Check for spelling mistakes
+            </li>
+          </ul>
+        </div>
+      </div>
+    </BaseEmptyState>
+  )
+
+  if (showCard) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="p-0">
+          {content}
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return content
+}
+
+// First Proposal Creation Guidance Component
+interface FirstProposalGuidanceProps {
+  className?: string
+  onCreateProposal?: () => void
+  showCard?: boolean
+}
+
+function FirstProposalGuidance({ 
+  className, 
+  onCreateProposal,
+  showCard = true 
+}: FirstProposalGuidanceProps) {
+  const content = (
+    <BaseEmptyState className={className}>
+      {/* Illustration */}
+      <div className="relative mb-6">
+        <div className="w-20 h-20 mx-auto bg-green-light/10 rounded-full flex items-center justify-center mb-4">
+          <FileCheck className="w-10 h-10 text-green-light" />
+        </div>
+        <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-light/20 rounded-full flex items-center justify-center">
+          <Zap className="w-4 h-4 text-blue-light" />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="space-y-4 max-w-md">
+        <div>
+          <h3 className="text-xl font-semibold text-foreground mb-2">
+            Create your first winning proposal
+          </h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            A great proposal is your first step to landing new clients. Follow our step-by-step guide to create 
+            professional proposals that convert prospects into paying clients.
+          </p>
+        </div>
+
+        {/* Call to Action */}
+        <div className="space-y-3">
+          <Button 
+            onClick={onCreateProposal}
+            className="bg-green-light hover:bg-green-light/90"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Start Creating Now
+          </Button>
+          
+          <div className="text-xs text-muted-foreground">
+            Our guided process makes it easy
+          </div>
+        </div>
+
+        {/* Proposal Steps */}
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-4 bg-muted/50 rounded-lg text-left">
+            <div className="flex items-center mb-2">
+              <Briefcase className="w-5 h-5 text-blue-light mr-2" />
+              <span className="font-medium">Client Information</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Start by adding your client's details and project requirements
+            </p>
+          </div>
+          
+          <div className="p-4 bg-muted/50 rounded-lg text-left">
+            <div className="flex items-center mb-2">
+              <FileText className="w-5 h-5 text-purple-light mr-2" />
+              <span className="font-medium">Project Scope</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Clearly define deliverables, timeline, and technical specifications
+            </p>
+          </div>
+          
+          <div className="p-4 bg-muted/50 rounded-lg text-left">
+            <div className="flex items-center mb-2">
+              <DollarSign className="w-5 h-5 text-green-light mr-2" />
+              <span className="font-medium">Pricing Strategy</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Set competitive rates with clear payment terms and conditions
+            </p>
+          </div>
+          
+          <div className="p-4 bg-muted/50 rounded-lg text-left">
+            <div className="flex items-center mb-2">
+              <Mail className="w-5 h-5 text-orange-light mr-2" />
+              <span className="font-medium">Send & Track</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Send professionally formatted proposals and track client engagement
+            </p>
+          </div>
         </div>
       </div>
     </BaseEmptyState>
@@ -608,6 +882,9 @@ function EmptyState({
 export {
   BaseEmptyState,
   EmptyProposals,
+  EmptyFilteredProposals,
+  EmptySearchResults,
+  FirstProposalGuidance,
   EmptyProjects,
   EmptyActivity,
   EmptyDeadlines,
