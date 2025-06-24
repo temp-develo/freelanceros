@@ -31,13 +31,26 @@ import {
   Plus,
   DollarSign,
   TrendingUp,
+  TrendingDown,
   Calendar,
   CheckCircle,
   AlertCircle,
   User,
   LogOut,
   Mail,
-  Phone
+  Phone,
+  Activity,
+  Timer,
+  Target,
+  Zap,
+  ArrowUpRight,
+  ArrowDownRight,
+  MoreHorizontal,
+  ExternalLink,
+  Send,
+  Eye,
+  Edit,
+  Trash2
 } from 'lucide-react'
 
 const sidebarItems = [
@@ -50,70 +63,168 @@ const sidebarItems = [
   { icon: Settings, label: 'Settings', href: '/settings' },
 ]
 
-const dashboardCards = [
-  {
-    title: 'Total Revenue',
-    value: '$24,580',
-    change: '+12.5%',
-    changeType: 'positive',
-    icon: DollarSign,
-    description: 'This month'
-  },
+// Enhanced stats cards with more detailed information
+const statsCards = [
   {
     title: 'Active Projects',
-    value: '8',
-    change: '+2',
+    value: '12',
+    change: '+3',
+    changePercent: '+25%',
     changeType: 'positive',
     icon: FolderOpen,
-    description: 'Currently running'
+    description: 'Currently running',
+    trend: 'up',
+    color: 'blue'
+  },
+  {
+    title: 'Pending Proposals',
+    value: '5',
+    change: '+2',
+    changePercent: '+67%',
+    changeType: 'positive',
+    icon: FileText,
+    description: 'Awaiting response',
+    trend: 'up',
+    color: 'purple'
+  },
+  {
+    title: 'This Month Revenue',
+    value: '$24,580',
+    change: '+$3,240',
+    changePercent: '+15.2%',
+    changeType: 'positive',
+    icon: DollarSign,
+    description: 'vs last month',
+    trend: 'up',
+    color: 'green'
   },
   {
     title: 'Hours Tracked',
     value: '156h',
-    change: '+8.2%',
+    change: '+12h',
+    changePercent: '+8.3%',
     changeType: 'positive',
     icon: Clock,
-    description: 'This month'
-  },
-  {
-    title: 'Pending Invoices',
-    value: '$8,420',
-    change: '-2.1%',
-    changeType: 'negative',
-    icon: AlertCircle,
-    description: 'Awaiting payment'
+    description: 'This month',
+    trend: 'up',
+    color: 'orange'
   }
 ]
 
-const recentProjects = [
+// Recent activity data
+const recentActivities = [
   {
-    name: 'Website Redesign',
+    type: 'proposal_sent',
+    title: 'Proposal sent to Acme Corp',
+    description: 'Website redesign proposal - $15,000',
+    time: '2 hours ago',
+    icon: Send,
+    color: 'blue'
+  },
+  {
+    type: 'project_completed',
+    title: 'Project milestone completed',
+    description: 'Mobile app wireframes for TechStart',
+    time: '5 hours ago',
+    icon: CheckCircle,
+    color: 'green'
+  },
+  {
+    type: 'payment_received',
+    title: 'Payment received',
+    description: '$5,000 from Creative Studio',
+    time: '1 day ago',
+    icon: DollarSign,
+    color: 'green'
+  },
+  {
+    type: 'meeting_scheduled',
+    title: 'Meeting scheduled',
+    description: 'Client review with Retail Plus',
+    time: '2 days ago',
+    icon: Calendar,
+    color: 'purple'
+  },
+  {
+    type: 'invoice_sent',
+    title: 'Invoice sent',
+    description: 'Monthly retainer - $3,500',
+    time: '3 days ago',
+    icon: FileText,
+    color: 'orange'
+  }
+]
+
+// Upcoming deadlines
+const upcomingDeadlines = [
+  {
+    project: 'Website Redesign',
     client: 'Acme Corp',
-    status: 'In Progress',
-    progress: 75,
-    deadline: '2024-02-15'
+    task: 'Final design review',
+    dueDate: '2024-02-15',
+    daysLeft: 3,
+    priority: 'high',
+    progress: 85
   },
   {
-    name: 'Mobile App Development',
+    project: 'Mobile App',
     client: 'TechStart Inc',
-    status: 'Review',
-    progress: 90,
-    deadline: '2024-02-28'
+    task: 'Development phase 2',
+    dueDate: '2024-02-20',
+    daysLeft: 8,
+    priority: 'medium',
+    progress: 60
   },
   {
-    name: 'Brand Identity',
+    project: 'Brand Identity',
     client: 'Creative Studio',
-    status: 'Planning',
-    progress: 25,
-    deadline: '2024-03-10'
+    task: 'Logo concepts',
+    dueDate: '2024-02-25',
+    daysLeft: 13,
+    priority: 'low',
+    progress: 30
+  },
+  {
+    project: 'E-commerce Platform',
+    client: 'Retail Plus',
+    task: 'User testing',
+    dueDate: '2024-03-01',
+    daysLeft: 18,
+    priority: 'medium',
+    progress: 45
   }
 ]
 
-const upcomingTasks = [
-  { task: 'Client meeting with Acme Corp', time: '10:00 AM', priority: 'high' },
-  { task: 'Submit project proposal', time: '2:00 PM', priority: 'medium' },
-  { task: 'Review design mockups', time: '4:30 PM', priority: 'low' },
-  { task: 'Update project timeline', time: '6:00 PM', priority: 'medium' }
+// Quick actions data
+const quickActions = [
+  {
+    title: 'New Proposal',
+    description: 'Create a new project proposal',
+    icon: FileText,
+    color: 'blue',
+    action: 'create_proposal'
+  },
+  {
+    title: 'New Project',
+    description: 'Start a new client project',
+    icon: FolderOpen,
+    color: 'green',
+    action: 'create_project'
+  },
+  {
+    title: 'Generate Invoice',
+    description: 'Create and send invoice',
+    icon: DollarSign,
+    color: 'orange',
+    action: 'create_invoice'
+  },
+  {
+    title: 'Time Tracking',
+    description: 'Start tracking your time',
+    icon: Timer,
+    color: 'purple',
+    action: 'start_timer'
+  }
 ]
 
 export default function DashboardPage() {
@@ -122,6 +233,11 @@ export default function DashboardPage() {
 
   const handleSignOut = async () => {
     await signOut()
+  }
+
+  const handleQuickAction = (action: string) => {
+    console.log(`Quick action: ${action}`)
+    // TODO: Implement actual actions
   }
 
   const SidebarContent = () => (
@@ -207,7 +323,7 @@ export default function DashboardPage() {
 
           {/* Search */}
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-            <div className="relative flex flex-1 items-center">
+            <div className="relative flex flex-1 items-center max-w-md">
               <Search className="pointer-events-none absolute left-3 h-4 w-4 text-muted-foreground" />
               <input
                 className="flex h-9 w-full rounded-md border border-input bg-background pl-10 pr-3 py-1 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -285,137 +401,180 @@ export default function DashboardPage() {
             {/* Page Header */}
             <div className="mb-8">
               <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground mt-2">
                 Welcome back! Here's what's happening with your freelance business.
               </p>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-              {dashboardCards.map((card) => (
-                <Card key={card.title} className="hover:shadow-md transition-shadow">
+            {/* Stats Cards Grid */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 mb-8">
+              {statsCards.map((card) => (
+                <Card key={card.title} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
                       {card.title}
                     </CardTitle>
-                    <card.icon className="h-4 w-4 text-muted-foreground" />
+                    <div className={`p-2 rounded-lg bg-${card.color}-light/10 group-hover:bg-${card.color}-light/20 transition-colors`}>
+                      <card.icon className={`h-4 w-4 text-${card.color}-light`} />
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{card.value}</div>
-                    <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                      <span className={`flex items-center ${
-                        card.changeType === 'positive' ? 'text-green-light' : 'text-red-light'
-                      }`}>
-                        <TrendingUp className="w-3 h-3 mr-1" />
-                        {card.change}
-                      </span>
-                      <span>{card.description}</span>
+                    <div className="text-2xl font-bold mb-1">{card.value}</div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-1 text-xs">
+                        {card.changeType === 'positive' ? (
+                          <ArrowUpRight className="w-3 h-3 text-green-light" />
+                        ) : (
+                          <ArrowDownRight className="w-3 h-3 text-red-light" />
+                        )}
+                        <span className={`font-medium ${
+                          card.changeType === 'positive' ? 'text-green-light' : 'text-red-light'
+                        }`}>
+                          {card.changePercent}
+                        </span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{card.description}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {card.change} {card.description}
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
 
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              {/* Recent Projects */}
-              <div className="lg:col-span-2">
+            {/* Main Dashboard Grid */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+              {/* Recent Activity Card */}
+              <div className="lg:col-span-8">
+                <Card className="h-full">
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center">
+                        <Activity className="w-5 h-5 mr-2 text-blue-light" />
+                        Recent Activity
+                      </CardTitle>
+                      <CardDescription>
+                        Your latest business activities and updates
+                      </CardDescription>
+                    </div>
+                    <Button variant="ghost" size="sm">
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {recentActivities.map((activity, index) => (
+                        <div key={index} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                          <div className={`p-2 rounded-lg bg-${activity.color}-light/10`}>
+                            <activity.icon className={`w-4 h-4 text-${activity.color}-light`} />
+                          </div>
+                          <div className="flex-1 space-y-1">
+                            <p className="text-sm font-medium">{activity.title}</p>
+                            <p className="text-xs text-muted-foreground">{activity.description}</p>
+                          </div>
+                          <span className="text-xs text-muted-foreground">{activity.time}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4 pt-4 border-t">
+                      <Button variant="outline" className="w-full">
+                        View All Activity
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Quick Actions Card */}
+              <div className="lg:col-span-4">
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Zap className="w-5 h-5 mr-2 text-yellow" />
+                      Quick Actions
+                    </CardTitle>
+                    <CardDescription>
+                      Common tasks and shortcuts
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {quickActions.map((action, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        className="w-full justify-start h-auto p-4 hover:shadow-md transition-all"
+                        onClick={() => handleQuickAction(action.action)}
+                      >
+                        <div className={`p-2 rounded-lg bg-${action.color}-light/10 mr-3`}>
+                          <action.icon className={`w-4 h-4 text-${action.color}-light`} />
+                        </div>
+                        <div className="text-left">
+                          <div className="font-medium text-sm">{action.title}</div>
+                          <div className="text-xs text-muted-foreground">{action.description}</div>
+                        </div>
+                      </Button>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                {/* Upcoming Deadlines Card */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Recent Projects</CardTitle>
+                    <CardTitle className="flex items-center">
+                      <Target className="w-5 h-5 mr-2 text-red-light" />
+                      Upcoming Deadlines
+                    </CardTitle>
                     <CardDescription>
-                      Your most recent project activity
+                      Projects and tasks due soon
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {recentProjects.map((project, index) => (
-                        <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="space-y-1">
-                            <p className="font-medium">{project.name}</p>
-                            <p className="text-sm text-muted-foreground">{project.client}</p>
-                            <div className="flex items-center space-x-2">
-                              <Badge variant={
-                                project.status === 'In Progress' ? 'default' :
-                                project.status === 'Review' ? 'secondary' : 'outline'
-                              }>
-                                {project.status}
+                      {upcomingDeadlines.map((deadline, index) => (
+                        <div key={index} className="space-y-3 p-3 border rounded-lg hover:shadow-sm transition-shadow">
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-1">
+                              <p className="font-medium text-sm">{deadline.project}</p>
+                              <p className="text-xs text-muted-foreground">{deadline.client}</p>
+                              <p className="text-xs">{deadline.task}</p>
+                            </div>
+                            <div className="text-right">
+                              <Badge 
+                                variant={
+                                  deadline.priority === 'high' ? 'destructive' :
+                                  deadline.priority === 'medium' ? 'secondary' : 'outline'
+                                }
+                                className="text-xs"
+                              >
+                                {deadline.daysLeft}d left
                               </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                Due: {project.deadline}
-                              </span>
                             </div>
                           </div>
-                          <div className="text-right space-y-1">
-                            <div className="text-sm font-medium">{project.progress}%</div>
-                            <div className="w-20 bg-muted rounded-full h-2">
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span>Progress</span>
+                              <span>{deadline.progress}%</span>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-1.5">
                               <div 
-                                className="bg-primary h-2 rounded-full transition-all"
-                                style={{ width: `${project.progress}%` }}
+                                className={`h-1.5 rounded-full transition-all ${
+                                  deadline.priority === 'high' ? 'bg-red-light' :
+                                  deadline.priority === 'medium' ? 'bg-yellow' : 'bg-green-light'
+                                }`}
+                                style={{ width: `${deadline.progress}%` }}
                               />
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Upcoming Tasks */}
-              <div>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Today's Schedule</CardTitle>
-                    <CardDescription>
-                      Your upcoming tasks and meetings
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {upcomingTasks.map((task, index) => (
-                        <div key={index} className="flex items-start space-x-3">
-                          <div className={`w-2 h-2 rounded-full mt-2 ${
-                            task.priority === 'high' ? 'bg-red-light' :
-                            task.priority === 'medium' ? 'bg-yellow' : 'bg-green-light'
-                          }`} />
-                          <div className="flex-1 space-y-1">
-                            <p className="text-sm font-medium">{task.task}</p>
-                            <p className="text-xs text-muted-foreground">{task.time}</p>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="mt-4 pt-4 border-t">
+                      <Button variant="outline" className="w-full">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        View All Deadlines
+                      </Button>
                     </div>
-                    <Separator className="my-4" />
-                    <Button variant="outline" className="w-full">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      View Full Calendar
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                {/* Quick Actions */}
-                <Card className="mt-6">
-                  <CardHeader>
-                    <CardTitle>Quick Actions</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <Button variant="outline" className="w-full justify-start">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Proposal
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      <Clock className="w-4 h-4 mr-2" />
-                      Start Time Tracking
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      <DollarSign className="w-4 h-4 mr-2" />
-                      Generate Invoice
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      <Mail className="w-4 h-4 mr-2" />
-                      Contact Client
-                    </Button>
                   </CardContent>
                 </Card>
               </div>
