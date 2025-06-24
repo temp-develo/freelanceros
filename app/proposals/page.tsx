@@ -32,7 +32,6 @@ import {
   FileText,
   FolderOpen,
   Users,
-  Clock,
   BarChart3,
   Settings,
   Menu,
@@ -64,7 +63,7 @@ const sidebarItems = [
   { icon: FileText, label: 'Proposals', href: '/proposals', active: true, badge: '3' },
   { icon: FolderOpen, label: 'Projects', href: '/projects', badge: '8' },
   { icon: Users, label: 'Client Portals', href: '/clients' },
-  { icon: Clock, label: 'Time Tracking', href: '/time-tracking' },
+  { icon: ClockIcon, label: 'Time Tracking', href: '/time-tracking' },
   { icon: BarChart3, label: 'Reports', href: '/reports' },
   { icon: Settings, label: 'Settings', href: '/settings' },
 ]
