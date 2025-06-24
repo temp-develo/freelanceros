@@ -42,7 +42,7 @@ interface EmptyProposalsProps {
   showCard?: boolean
 }
 
-export function EmptyProposals({ 
+function EmptyProposals({ 
   className, 
   onCreateProposal,
   showCard = true 
@@ -131,7 +131,7 @@ interface EmptyProjectsProps {
   showCard?: boolean
 }
 
-export function EmptyProjects({ 
+function EmptyProjects({ 
   className, 
   onCreateProject,
   showCard = true 
@@ -237,7 +237,7 @@ interface EmptyActivityProps {
   showCard?: boolean
 }
 
-export function EmptyActivity({ 
+function EmptyActivity({ 
   className,
   showCard = true 
 }: EmptyActivityProps) {
@@ -287,7 +287,7 @@ interface EmptyDeadlinesProps {
   showCard?: boolean
 }
 
-export function EmptyDeadlines({ 
+function EmptyDeadlines({ 
   className,
   onCreateProject,
   showCard = true 
@@ -349,7 +349,7 @@ interface EmptyClientsProps {
   showCard?: boolean
 }
 
-export function EmptyClients({ 
+function EmptyClients({ 
   className,
   onAddClient,
   showCard = true 
@@ -416,7 +416,7 @@ interface EmptyTimeEntriesProps {
   showCard?: boolean
 }
 
-export function EmptyTimeEntries({ 
+function EmptyTimeEntries({ 
   className,
   onStartTimer,
   showCard = true 
@@ -480,7 +480,7 @@ interface EmptyInvoicesProps {
   showCard?: boolean
 }
 
-export function EmptyInvoices({ 
+function EmptyInvoices({ 
   className,
   onCreateInvoice,
   showCard = true 
@@ -552,7 +552,7 @@ interface EmptyStateProps {
   iconColor?: string
 }
 
-export function EmptyState({
+function EmptyState({
   icon: Icon,
   title,
   description,
