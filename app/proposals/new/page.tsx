@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { AppLayout } from '@/components/layout/AppLayout'
 import { useAuth } from '@/hooks/useAuth'
 import { useProposalForm } from '@/hooks/useProposalForm'
 import { 
@@ -48,6 +47,7 @@ import {
 import { FormFieldError, FormStepErrorSummary } from '@/components/ui/form-field-error'
 import { AutoSaveIndicator, ConnectionStatus } from '@/components/ui/auto-save-indicator'
 import { AIGenerateButton } from '@/components/ai/AIGenerateButton'
+import { ProposalFormSkeleton } from '@/components/ui/proposal-skeletons'
 import {
   ArrowLeft,
   ArrowRight,
@@ -195,6 +195,7 @@ export default function NewProposalPage() {
   const [isOnline, setIsOnline] = useState(true)
   const [showDraftDialog, setShowDraftDialog] = useState(false)
   const [draftAge, setDraftAge] = useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   // Initialize form with auto-save and validation
   const {
@@ -236,6 +237,14 @@ export default function NewProposalPage() {
     },
     initialData: user?.id ? loadProposalDraft(user.id) || {} : {}
   })
+
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Check for existing draft on mount
   useEffect(() => {
@@ -872,8 +881,35 @@ export default function NewProposalPage() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push('/proposals')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Back to Proposals</span>
+          </Button>
+          <div className="flex-1"></div>
+          <div className="flex items-center gap-x-4 lg:gap-x-6">
+            {headerActions}
+          </div>
+        </header>
+        <div className="py-8">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+            <ProposalFormSkeleton />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <AppLayout headerActions={headerActions}>
+    <div className="min-h-screen bg-background">
       {/* Draft Recovery Dialog */}
       <AlertDialog open={showDraftDialog} onOpenChange={setShowDraftDialog}>
         <AlertDialogContent>
@@ -897,20 +933,28 @@ export default function NewProposalPage() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Header */}
+      <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push('/proposals')}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="hidden sm:inline">Back to Proposals</span>
+        </Button>
+        <div className="flex-1"></div>
+        <div className="flex items-center gap-x-4 lg:gap-x-6">
+          {headerActions}
+        </div>
+      </header>
+
       <div className="py-8">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
           <div className="mb-8">
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push('/proposals')}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Back to Proposals</span>
-              </Button>
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">Create New Proposal</h1>
                 <p className="text-muted-foreground mt-2">
@@ -1040,6 +1084,6 @@ export default function NewProposalPage() {
           )}
         </div>
       </div>
-    </AppLayout>
+    </div>
   )
 }

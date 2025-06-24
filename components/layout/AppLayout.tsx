@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -40,6 +41,10 @@ export function AppLayout({
 }: AppLayoutProps) {
   const { user, signOut } = useAuth()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const pathname = usePathname()
+  
+  // Check if we should hide the sidebar (for specific pages)
+  const hideSidebar = pathname === '/proposals/new'
 
   const handleSignOut = async () => {
     await signOut()
@@ -48,21 +53,35 @@ export function AppLayout({
   return (
     <div className={cn("min-h-screen bg-background", className)}>
       {/* Mobile Sidebar */}
-      <MobileSidebar 
-        isOpen={mobileSidebarOpen} 
-        onOpenChange={setMobileSidebarOpen}
-        items={sidebarItems}
-      />
+      {!hideSidebar && (
+        <MobileSidebar 
+          isOpen={mobileSidebarOpen} 
+          onOpenChange={setMobileSidebarOpen}
+          items={sidebarItems}
+        />
+      )}
 
       {/* Desktop Sidebar */}
-      <Sidebar items={sidebarItems} />
+      {!hideSidebar && (
+        <Sidebar items={sidebarItems} />
+      )}
 
       {/* Main Content */}
-      <div className="lg:pl-80 transition-all duration-300">
+      <div className={cn(
+        "transition-all duration-300",
+        hideSidebar ? "lg:pl-0" : "lg:pl-80"
+      )}>
         {/* Header */}
         <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
           {/* Mobile menu button */}
-          <SidebarTrigger onClick={() => setMobileSidebarOpen(true)} />
+          {!hideSidebar && (
+            <SidebarTrigger onClick={() => setMobileSidebarOpen(true)} />
+          )}
+
+          {/* Back button for pages without sidebar */}
+          {hideSidebar && (
+            <div className="w-8 h-8"></div> // Spacer to maintain layout
+          )}
 
           {/* Search */}
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
