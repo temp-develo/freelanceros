@@ -113,20 +113,6 @@ export default function ProposalsPage() {
     }
   }
 
-  // Custom header actions for proposals page
-  const headerActions = (
-    <div className="flex items-center gap-2">
-      <Button variant="outline" size="sm">
-        <Filter className="w-4 h-4 mr-2" />
-        Filter
-      </Button>
-      <Button onClick={() => router.push('/proposals/new')}>
-        <Plus className="w-4 h-4 mr-2" />
-        New Proposal
-      </Button>
-    </div>
-  )
-
   // Determine which empty state to show
   const getEmptyStateType = () => {
     if (searchQuery) {
@@ -145,7 +131,7 @@ export default function ProposalsPage() {
   }
 
   return (
-    <AppLayout headerActions={headerActions}>
+    <AppLayout>
       <div className="py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
@@ -157,7 +143,7 @@ export default function ProposalsPage() {
                   Manage your project proposals and track their status
                 </p>
               </div>
-              <div className="flex items-center gap-3 sm:hidden">
+              <div className="flex items-center gap-3">
                 <Button variant="outline" size="sm">
                   <Filter className="w-4 h-4 mr-2" />
                   Filter
@@ -327,7 +313,11 @@ export default function ProposalsPage() {
                   </TableHeader>
                   <TableBody>
                     {proposals.map((proposal) => (
-                      <TableRow key={proposal.id} className="cursor-pointer hover:bg-muted/50">
+                      <TableRow 
+                        key={proposal.id} 
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => router.push(`/proposals/${proposal.id}`)}
+                      >
                         <TableCell>
                           <div>
                             <div className="font-medium">{proposal.title}</div>
@@ -360,47 +350,11 @@ export default function ProposalsPage() {
                             {formatDate(proposal.createdAt)}
                           </span>
                         </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="w-4 h-4" />
-                                <span className="sr-only">Open menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => router.push(`/proposals/${proposal.id}`)}>
-                                <Eye className="mr-2 h-4 w-4" />
-                                View
-                              </DropdownMenuItem>
-                              {proposal.status === 'draft' && (
-                                <DropdownMenuItem onClick={() => router.push(`/proposals/${proposal.id}/edit`)}>
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Edit
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem>
-                                <Copy className="mr-2 h-4 w-4" />
-                                Duplicate
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem>
-                                <Download className="mr-2 h-4 w-4" />
-                                Download PDF
-                              </DropdownMenuItem>
-                              {proposal.status === 'draft' && (
-                                <DropdownMenuItem>
-                                  <Send className="mr-2 h-4 w-4" />
-                                  Send to Client
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-600">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <ProposalActions 
+                            proposal={proposal} 
+                            onActionComplete={refetch}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -419,12 +373,16 @@ export default function ProposalsPage() {
                     <div className="space-y-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h3 className="text-lg font-medium line-clamp-1">{proposal.title}</h3>
-                          <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                            {proposal.description}
-                          </p>
+                          <h3 className="font-medium line-clamp-1">{proposal.title}</h3>
+                          {proposal.description && (
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {proposal.description}
+                            </p>
+                          )}
                         </div>
-                        <ProposalActions proposal={proposal} onActionComplete={refetch} />
+                        <div onClick={(e) => e.stopPropagation()}>
+                          <ProposalActions proposal={proposal} onActionComplete={refetch} />
+                        </div>
                       </div>
                       
                       <div className="flex items-center gap-3">

@@ -100,12 +100,6 @@ export function AppLayout({
             {/* Custom header actions */}
             {headerActions}
 
-            {/* Default actions */}
-            <Button size="sm" className="hidden sm:flex">
-              <Plus className="w-4 h-4 mr-2" />
-              New Project
-            </Button>
-
             {/* Notifications */}
             <Button variant="ghost" size="sm" className="relative">
               <Bell className="w-5 h-5" />
